@@ -4,7 +4,6 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Data
 @Entity

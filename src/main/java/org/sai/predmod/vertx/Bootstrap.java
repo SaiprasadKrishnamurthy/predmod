@@ -35,5 +35,6 @@ public class Bootstrap {
         vertx.registerVerticleFactory(verticleFactory);
         vertx.deployVerticle(verticleFactory.prefix() + ":" + TrainingVerticle.class.getName(), new DeploymentOptions().setInstances(appConfig.getWorkerInstances()).setWorker(true));
         vertx.deployVerticle(verticleFactory.prefix() + ":" + TrainingFinishedVerticle.class.getName(), new DeploymentOptions().setInstances(appConfig.getWorkerInstances()).setWorker(true));
+        vertx.deployVerticle(verticleFactory.prefix() + ":" + PredictionVerticle.class.getName(), new DeploymentOptions().setInstances(appConfig.getWorkerInstances()).setWorker(true));
     }
 }

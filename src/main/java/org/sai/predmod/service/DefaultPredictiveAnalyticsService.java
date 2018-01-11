@@ -14,8 +14,10 @@ import org.encog.ml.data.versatile.sources.VersatileDataSource;
 import org.encog.ml.model.EncogModel;
 import org.sai.predmod.entity.PredictiveModel;
 import org.sai.predmod.entity.PredictiveModelDef;
+import org.sai.predmod.entity.PredictiveModelHistory;
 import org.sai.predmod.entity.PredictiveModelJobStatusType;
 import org.sai.predmod.model.PredictiveAnalyticsService;
+import org.sai.predmod.repository.PredictiveModelHistoryRepository;
 import org.sai.predmod.repository.PredictiveModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,13 +30,16 @@ import java.util.Map;
 public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsService {
 
     private final PredictiveModelRepository predictiveModelRepository;
+    private final PredictiveModelHistoryRepository predictiveModelHistoryRepository;
     private final DatasourceFactory datasourceFactory;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     public DefaultPredictiveAnalyticsService(final PredictiveModelRepository predictiveModelRepository,
+                                             final PredictiveModelHistoryRepository predictiveModelHistoryRepository,
                                              final DatasourceFactory datasourceFactory) {
         this.predictiveModelRepository = predictiveModelRepository;
+        this.predictiveModelHistoryRepository = predictiveModelHistoryRepository;
         this.datasourceFactory = datasourceFactory;
     }
 
@@ -46,6 +51,7 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
     @Override
     public void train(final PredictiveModel predictiveModel) {
         try {
+            snapshotHistory(predictiveModel);
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             PredictiveModelDef predictiveModelDef = OBJECT_MAPPER.readValue(new String(predictiveModel.getPredModelDefJson()), PredictiveModelDef.class);
@@ -114,8 +120,18 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
     }
 
     @Override
-    public boolean snapshotHistory(final PredictiveModel predictiveModelJobConfig) {
-        return false;
+    public void snapshotHistory(final PredictiveModel predictiveModelJobConfig) {
+        PredictiveModelHistory predictiveModelHistory = new PredictiveModelHistory();
+        predictiveModelHistory.setError(predictiveModelJobConfig.getError());
+        predictiveModelHistory.setLastTrainedDateTime(predictiveModelJobConfig.getLastTrainedDateTime());
+        predictiveModelHistory.setLastTrainingTimeTookInSeconds(predictiveModelJobConfig.getLastTrainingTimeTookInSeconds());
+        predictiveModelHistory.setNormalizedValuesBlob(predictiveModelJobConfig.getNormalizedValuesBlob());
+        predictiveModelHistory.setPredModelDefJson(predictiveModelJobConfig.getPredModelDefJson());
+        predictiveModelHistory.setStatus(predictiveModelJobConfig.getStatus());
+        predictiveModelHistory.setTrainedModelBlob(predictiveModelJobConfig.getTrainedModelBlob());
+        predictiveModelHistory.setTrainingDatasetSize(predictiveModelJobConfig.getTrainingDatasetSize());
+        predictiveModelHistory.setPredModelDefId(predictiveModelJobConfig.getPredModelDefId());
+        predictiveModelHistoryRepository.save(predictiveModelHistory);
     }
 
     @Override

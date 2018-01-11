@@ -2,8 +2,10 @@ package org.sai.predmod;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import org.encog.ml.data.versatile.columns.ColumnType;
 import org.sai.predmod.entity.*;
+import org.sai.predmod.model.PredictionInput;
 import org.sai.predmod.model.PredictiveAnalyticsService;
 import org.sai.predmod.repository.PredictiveModelRepository;
 import org.sai.predmod.vertx.Bootstrap;
@@ -23,6 +25,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -60,7 +63,7 @@ public class Application {
         def.setId("iris-classification");
         def.setDescription("Iris classification");
         def.setDatasourceType(DatasourceType.CSV);
-        def.setDatasourceValue("iris2.csv");
+        def.setDatasourceValue("iris.csv");
         List<Column> cols = Arrays.asList("sepal-length", "sepal-width", "petal-length", "petal-width")
                 .stream()
                 .map(col -> {
@@ -82,6 +85,12 @@ public class Application {
         model.setPredModelDefJson(json.getBytes());
         model.setPredModelDefId(def.getId());
         predictiveModelRepository.save(model);
+        Map<String, Object> inputs = ImmutableMap.of("sepal-length", 5.7, "sepal-width", 3.0, "petal-length", 4.2, "petal-width", 1.2);
+        PredictionInput predictionInput = new PredictionInput();
+        predictionInput.setModelId("iris-classification");
+        predictionInput.setInputs(inputs);
+        System.out.println(new ObjectMapper().writeValueAsString(predictionInput));
+
 
         /*System.out.println(new ObjectMapper().writeValueAsString(def));
         System.out.println("Start training ");
