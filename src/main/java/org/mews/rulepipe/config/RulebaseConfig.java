@@ -16,7 +16,7 @@ import java.util.List;
 public class RulebaseConfig {
     public static final List<Method> LIB_METHODS = new ArrayList<>();
 
-    @Value("${ruleExecutorInstances ?: 8}")
+    @Value("${workerInstances ?: 8}")
     private int ruleExecutorInstances;
 
     @Value("${ruleLibraryBasePkgs}")

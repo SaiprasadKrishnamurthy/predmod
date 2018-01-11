@@ -16,7 +16,7 @@ import org.sai.predmod.entity.PredictiveModel;
 import org.sai.predmod.entity.PredictiveModelDef;
 import org.sai.predmod.entity.PredictiveModelJobStatusType;
 import org.sai.predmod.model.PredictiveAnalyticsService;
-import org.sai.predmod.repository.PredModelJobLogRepository;
+import org.sai.predmod.repository.PredictiveModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,20 +26,20 @@ import java.util.Map;
 @Service
 public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsService {
 
-    private final PredModelJobLogRepository predModelJobLogRepository;
+    private final PredictiveModelRepository predictiveModelRepository;
     private final DatasourceFactory datasourceFactory;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
-    public DefaultPredictiveAnalyticsService(final PredModelJobLogRepository predModelJobLogRepository,
+    public DefaultPredictiveAnalyticsService(final PredictiveModelRepository predictiveModelRepository,
                                              final DatasourceFactory datasourceFactory) {
-        this.predModelJobLogRepository = predModelJobLogRepository;
+        this.predictiveModelRepository = predictiveModelRepository;
         this.datasourceFactory = datasourceFactory;
     }
 
     @Override
     public boolean trainingInProgress(final PredictiveModel predictiveModelJobConfig) {
-        return predModelJobLogRepository.findByPredModelDefId(predictiveModelJobConfig.getPredModelDefId()).getStatus() == PredictiveModelJobStatusType.InProgress;
+        return predictiveModelRepository.findByPredModelDefId(predictiveModelJobConfig.getPredModelDefId()).getStatus() == PredictiveModelJobStatusType.InProgress;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
             predictiveModel.setNormalizedValuesBlob(helperSer);
 
             // update the model.
-            predModelJobLogRepository.save(predictiveModel);
+            predictiveModelRepository.save(predictiveModel);
 
         } catch (Exception e) {
             e.printStackTrace();

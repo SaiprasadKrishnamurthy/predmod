@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface PredModelJobLogRepository extends CrudRepository<PredictiveModel, Long> {
+public interface PredictiveModelRepository extends CrudRepository<PredictiveModel, Long> {
     PredictiveModel findByPredModelDefId(String predModelDefId);
 
     List<PredictiveModel> findByStatusOrderByLastTrainedDateTime(PredictiveModelJobStatusType statusType);

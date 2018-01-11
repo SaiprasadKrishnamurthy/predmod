@@ -2,11 +2,12 @@ package org.sai.predmod;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
 import org.encog.ml.data.versatile.columns.ColumnType;
 import org.sai.predmod.entity.*;
 import org.sai.predmod.model.PredictiveAnalyticsService;
-import org.sai.predmod.repository.PredModelJobLogRepository;
+import org.sai.predmod.repository.PredictiveModelRepository;
+import org.sai.predmod.vertx.Bootstrap;
+import org.sai.predmod.vertx.TrainingVerticle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +23,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -46,19 +46,21 @@ public class Application {
 
 
     @Bean
-    public CommandLineRunner loadData(final PredModelJobLogRepository predModelJobLogRepository, final PredictiveAnalyticsService predictiveAnalyticsService) {
+    public CommandLineRunner loadData(final PredictiveModelRepository predictiveModelRepository,
+                                      final PredictiveAnalyticsService predictiveAnalyticsService,
+                                      final Bootstrap bootstrap) {
         return (args) -> {
-            irisClassification(predModelJobLogRepository, predictiveAnalyticsService);
-
+            irisClassification(predictiveModelRepository, predictiveAnalyticsService);
+            bootstrap.getVertx().eventBus().send(TrainingVerticle.class.getName(), "iris-classification");
         };
     }
 
-    private void irisClassification(PredModelJobLogRepository predModelJobLogRepository, PredictiveAnalyticsService predictiveAnalyticsService) throws JsonProcessingException {
+    private void irisClassification(PredictiveModelRepository predictiveModelRepository, PredictiveAnalyticsService predictiveAnalyticsService) throws JsonProcessingException {
         PredictiveModelDef def = new PredictiveModelDef();
         def.setId("iris-classification");
         def.setDescription("Iris classification");
         def.setDatasourceType(DatasourceType.CSV);
-        def.setDatasourceValue("iris.csv");
+        def.setDatasourceValue("iris2.csv");
         List<Column> cols = Arrays.asList("sepal-length", "sepal-width", "petal-length", "petal-width")
                 .stream()
                 .map(col -> {
@@ -74,17 +76,18 @@ public class Application {
         def.setPredictedColumn(out);
         def.setProblemType(ProblemType.classification);
         def.setModelType(ModelType.feedforward);
-        def.setTrainingIterations(5);
+        def.setTrainingIterations(2);
         String json = new ObjectMapper().writeValueAsString(def);
         PredictiveModel model = new PredictiveModel();
         model.setPredModelDefJson(json.getBytes());
-        predModelJobLogRepository.save(model);
+        model.setPredModelDefId(def.getId());
+        predictiveModelRepository.save(model);
 
-        System.out.println(new ObjectMapper().writeValueAsString(def));
+        /*System.out.println(new ObjectMapper().writeValueAsString(def));
         System.out.println("Start training ");
         predictiveAnalyticsService.train(model);
 
-        System.out.println(predModelJobLogRepository.findAll());
+        System.out.println(predictiveModelRepository.findAll());
 
         System.out.println("Start Prediction ");
 
@@ -100,7 +103,7 @@ public class Application {
         inputs = ImmutableMap.of("sepal-length", 5.1, "sepal-width", 3.5, "petal-length", 1.4, "petal-width", 0.3);
         System.out.println(predictiveAnalyticsService.predict(model, inputs));
 
-        System.out.println(" ----- ");
+        System.out.println(" ----- ");*/
     }
 
     public static void main(String[] args) {
