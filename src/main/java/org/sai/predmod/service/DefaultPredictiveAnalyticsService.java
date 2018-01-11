@@ -19,6 +19,7 @@ import org.sai.predmod.model.PredictiveAnalyticsService;
 import org.sai.predmod.repository.PredictiveModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -45,6 +46,8 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
     @Override
     public void train(final PredictiveModel predictiveModel) {
         try {
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
             PredictiveModelDef predictiveModelDef = OBJECT_MAPPER.readValue(new String(predictiveModel.getPredModelDefJson()), PredictiveModelDef.class);
             VersatileDataSource dataSource = datasourceFactory.dataSource(predictiveModelDef);
             VersatileMLDataSet data = new VersatileMLDataSet(dataSource);
@@ -95,8 +98,11 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
             byte[] bestMethodSer = SerializationUtils.serialize((Serializable) bestMethod);
             byte[] helperSer = SerializationUtils.serialize(helper);
 
+            stopWatch.stop();
             predictiveModel.setTrainedModelBlob(bestMethodSer);
             predictiveModel.setNormalizedValuesBlob(helperSer);
+            predictiveModel.setTrainingDatasetSize(model.getTrainingDataset().size());
+            predictiveModel.setLastTrainingTimeTookInSeconds(stopWatch.getTotalTimeSeconds());
 
             // update the model.
             predictiveModelRepository.save(predictiveModel);

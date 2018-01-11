@@ -3,6 +3,7 @@ package org.sai.predmod.vertx;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
+import org.sai.predmod.entity.PredictiveModel;
 import org.sai.predmod.repository.PredictiveModelRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,5 +38,7 @@ public class TrainingFinishedVerticle extends AbstractVerticle {
     private void exec(final Message<String> msg) {
         String predDefId = msg.body();
         LOG.info(" \t Training Finished : {}, Snapshotting: {}", predDefId, predDefId);
+        PredictiveModel model = predictiveModelRepository.findByPredModelDefId(predDefId);
+        LOG.info("TRaining {} took: {} seconds (Training set size: {}) ", predDefId, model.getLastTrainingTimeTookInSeconds(), model.getTrainingDatasetSize());
     }
 }

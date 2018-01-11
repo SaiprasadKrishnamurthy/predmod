@@ -33,7 +33,7 @@ public class PredictiveModel {
     private long lastTrainedDateTime;
 
     @Column
-    private long lastTrainingTimeTookInSeconds;
+    private double lastTrainingTimeTookInSeconds;
 
     @Column
     private long trainingDatasetSize;

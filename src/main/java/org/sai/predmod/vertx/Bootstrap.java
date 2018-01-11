@@ -13,9 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
-/**
- * Created by saipkri on 14/04/17.
- */
 @Component
 @Configuration
 @Data
