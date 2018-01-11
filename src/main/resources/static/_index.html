@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preclearance Nationalities</title>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <script src="jquery.min.js"></script>
+    <script src="webfont.js"></script>
+    <script src="snap.svg-min.js"></script>
+    <script src="underscore-min.js"></script>
+    <script src="mermaid.js"></script>
+    <link href="mermaid.css" rel="stylesheet" type="text/css"/>
+    <script src="mermaid.js"></script>
+
+
+    <style>
+        .panel {
+           overflow: auto;
+        }
+        .panel {
+           overflow: auto;
+        }
+    </style>
+</head>
+<body>
+<form>
+    <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript
+        being
+        enabled. Please enable
+        Javascript and reload this page!</h2></noscript>
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Rules Viz</a>
+            </div>
+        </div>
+    </nav>
+    <div id="main-content" class="container">
+        <div class="row">
+            <div class="panel">
+                <div class="panel-heading">Transaction ID: {{ x.ID }}, Rule family: {{ x.FAMILY }}</div>
+                <div class="panel-body">
+                    <div class="col-md-12">
+                            <div class="mermaid">
+
+
+                                graph LR
+                                NationalityCheckRule[NationalityCheckRule]  ==&gt;  EventTypeAndSubTypeCheckRule[EventTypeAndSubTypeCheckRule]
+                                EventTypeAndSubTypeCheckRule[EventTypeAndSubTypeCheckRule]  ==&gt;  GenderCheckRule[GenderCheckRule]
+                                CountryOfBirthCheckRule[CountryOfBirthCheckRule]  ==&gt;  NationalityCheckRule[NationalityCheckRule]
+                                PlaceOfBirthRule[PlaceOfBirthRule]  ==&gt;  TypeOfVisaRule[TypeOfVisaRule]
+                                SSNCheckRule[SSNCheckRule]  ==&gt;  PlaceOfBirthRule[PlaceOfBirthRule]
+                                CountryOfBirthCheckRule[CountryOfBirthCheckRule]  ==&gt;  SSNCheckRule[SSNCheckRule]
+                                GenderCheckRule[GenderCheckRule]  ==&gt;  PlaceOfBirthRule[PlaceOfBirthRule]
+
+                                classDef green fill:#9f6,stroke:#333,stroke-width:2px;
+                                classDef red fill:#FF6347,stroke:#333,stroke-width:4px;
+                                classDef orange fill:orange,stroke:#333,stroke-width:4px;
+                                class NationalityCheckRule,GenderCheckRule,PlaceOfBirthRule,TypeOfVisaRule,SSNCheckRule green
+                                class EventTypeAndSubTypeCheckRule,CountryOfBirthCheckRule red
+
+
+                            </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+        </div>
+        <div id="ss">{{ draw() }}...</div>
+    </div>
+</form>
+</body>
+</html>

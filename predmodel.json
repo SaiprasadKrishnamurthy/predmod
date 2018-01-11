@@ -1,0 +1,28 @@
+{
+  "id": "something",
+  "description": "sssss",
+  "datasource": {
+    "kind": "csv|rdbms|mongo",
+    "value": "/s/s/s.csv | movies"
+  },
+  "inputcolumns": [
+    {
+      "name": "foo",
+      "kind": "ordinal",
+      "enumeration": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "name": "bar",
+      "kind": "continuous"
+    }
+  ],
+  "predictedColumn": {
+    "name": "bar",
+    "kind": "continuous"
+  },
+  "problemType": "CLASSIFICATION|REGRESSION",
+  "modelType": "TYPE_FEEDFORWARD"
+}

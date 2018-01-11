@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<meta name="robots" content="noindex">
+<html>
+<head>
+    <script type="text/javascript" src="/mermaid.js"></script>
+    <link href="mermaid.css" rel="stylesheet" type="text/css"/>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <script src="jquery.min.js"></script>
+    <script src="webfont.js"></script>
+    <script src="snap.svg-min.js"></script>
+    <script src="underscore-min.js"></script>
+    <script src="angular.min.js"></script>
+    <script src="mermaid.js"></script>
+    <script>
+        var app = angular.module("myApp", []);
+        app.controller("myCtrl", function($scope, $http) {
+            $http.get('/ruleaudits').
+                then(function(response) {
+                $scope.ruleaudits = response.data;
+            });
+        });
+
+    </script>
+
+    <style>
+        .label{
+            color: #000
+        }
+
+    </style>
+
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Rules Viz</a>
+        </div>
+    </div>
+</nav>
+<div id="main-content" class="container">
+    <div class="row">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Transaction: {{ x.transactionId }}</div>
+            <div class="panel-body">
+                <div class="alert alert-danger" role="alert">
+                    RuleFlow: {{ x.flowName }}
+                </div>
+                <div class="col-md-12">
+                    <div class="mermaid">
+                        graph LR
+                        CountryOfBirthCheckRule[Square Rect]  ==>  NationalityCheckRule[Square Rect]
+                        NationalityCheckRule[Square Rect]  ==>  EventTypeAndSubTypeCheckRule[Square Rect]
+                        EventTypeAndSubTypeCheckRule[Square Rect]  ==>  GenderCheckRule[Square Rect]
+
+                        classDef green fill:#9f6,stroke:#333,stroke-width:2px;
+                        classDef red fill:red,stroke:#333,stroke-width:4px;
+                        class CountryOfBirthCheckRule,NationalityCheckRule,EventTypeAndSubTypeCheckRule,GenderCheckRule green
+
+                    </div>
+                    <div class="col-md-2">
+                        <div class="jumbotron">
+                            <h2 class="display-4">{{ x.totalTimeTakenInMillis }} ms</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Rule Name</th>
+                                <th>Description</th>
+                                <th>Execution Time in millis</th>
+                                <th>Short circuited</th>
+                                <th>Rule Definition</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <th scope="row">1</th>
+                                <td>NationalityCheckRule</td>
+                                <td>Rule that checks the nationality</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">2</th>
+                                <td>DOBCheckRule</td>
+                                <td>Rule that checks the date of birth</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">3</th>
+                                <td>GenderCheckRule</td>
+                                <td>Rule that checks the Gender</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">4</th>
+                                <td>PlaceOfBirthRule</td>
+                                <td>Rule that checks the Place of Birth</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">4</th>
+                                <td>PlaceOfBirthRule</td>
+                                <td>Rule that checks the Place of Birth</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">5</th>
+                                <td>PlaceOfBirthRule</td>
+                                <td>Rule that checks the Place of Birth</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">6</th>
+                                <td>PlaceOfBirthRule</td>
+                                <td>Rule that checks the Place of Birth</td>
+                                <td>3</td>
+                                <td>N</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <hr/>
+    </div>
+</div>
+<hr/>
+<script>mermaid.initialize({startOnLoad:true});</script>
+</body>
+</html>

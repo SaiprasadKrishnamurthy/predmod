@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta name="robots" content="noindex">
+<html>
+<head>
+    <script type="text/javascript" src="/mermaid.js"></script>
+    <link href="/mermaid.css" rel="stylesheet" type="text/css"/>
+    <link href="/bootstrap.min.css" rel="stylesheet">
+    <script src="/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script type="text/javascript" src="/d3.min.js"></script>
+    <script type="text/javascript" src="/plotly-latest.min.js"></script>
+
+
+    <style>
+        div.well {
+            overflow-y: scroll;
+        }
+    </style>
+    <script>
+  function connect() {
+    var socket = new SockJS('/gs-guide-websocket');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        stompClient.subscribe('/topic/rulestats', function (data) {
+            plot(data);
+        });
+        stompClient.subscribe('/topic/errorFlows', function (data) {
+            errorFlows(data);
+        });
+        initiate();
+    });
+}
+
+function disconnect() {
+    if (stompClient != null) {
+        stompClient.disconnect();
+    }
+    console.log("Disconnected");
+}
+
+function initiate() {
+    console.log("Sending...");
+    stompClient.send("/app/hello1", {});
+}
+
+connect();
+
+function plot(data) {
+        var res = JSON.parse(data.body);
+        var trace1 = {
+          x: res.map(function(x){
+            return x.transactionId;
+          }),
+          y: res.map(function(x){
+            return x.totalTimeTakenInMillis;
+          }),
+          type: 'scatter'
+        };
+
+        var layout = {
+            title: 'RuleFlow execution times in milliseconds'
+        };
+
+        var data = [trace1];
+
+        Plotly.newPlot('perf', data, layout);
+}
+
+function errorFlows(data) {
+   var res = JSON.parse(data.body);
+    var data = [{
+      values: [res['Total Errors'], res['Total Success']],
+      labels: ['Total Errors', 'Total Success'],
+      type: 'pie',
+      hoverinfo: 'label+percent+name',
+      textposition: 'inside'
+    }];
+
+    var layout = {
+      height: 500,
+      width: 500,
+      title: 'Transaction status breakdown',
+    };
+    Plotly.newPlot('errorFlows', data, layout);
+}
+
+    </script>
+
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Rulebase</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Transactions <span class="sr-only">(current)</span></a></li>
+                <li><a href="/stats.html">Realtime Txn stats</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <button type="submit" id="run" class="btn btn-danger">Run a few samples</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="perf">
+</div>
+<hr/>
+<div id="errorFlows">
+</div>
+<script>
+    $('#run').click(function(e) {
+            e.preventDefault();
+
+          for(var i=0; i<20; i++) {
+            $.ajax({
+                'url' : '/run',
+                'type' : 'GET',
+                error: function() {
+                },
+                'success' : function(data) {
+                   if (data == "success") {
+                        debugger;
+                   }
+                }
+            });
+          }
+        });
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<meta name="robots" content="noindex">
+<html>
+<head>
+    <script type="text/javascript" src="/mermaid.js"></script>
+    <link href="/mermaid.css" rel="stylesheet" type="text/css"/>
+    <link href="bootstrap.min.css" rel="stylesheet">
+    <script src="/jquery.min.js"></script>
+    <script src="/webfont.js"></script>
+    <script src="/snap.svg-min.js"></script>
+    <script src="/underscore-min.js"></script>
+    <script src="/angular.min.js"></script>
+    <script src="/angular.sanitize.js"></script>
+    <script src="/mermaid.js"></script>
+    <style>
+        div.well {
+            overflow-y: scroll;
+        }
+
+
+
+
+    </style>
+    <script>
+        var app = angular.module("myApp", []);
+        app.controller("myCtrl", function($scope, $http) {
+            $http.get('/ruleaudits').
+                then(function(response) {
+                $scope.ruleaudits = response.data;
+            });
+
+            $scope.draw = function(id) {
+                setTimeout(function() {
+                    mermaidAPI.render(id, $("#"+id).text().trim(), function(code, fns){document.getElementById(id).innerHTML=code});
+                }, 1);
+            }
+
+        });
+
+
+
+
+    </script>
+
+    <style>
+        .label{
+            color: #000
+        }
+        svg { width: 200% }
+
+    </style>
+
+</head>
+<body ng-app="myApp" ng-controller="myCtrl">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">Rulebase</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="/">Transactions <span class="sr-only">(current)</span></a></li>
+                <li><a href="/stats.html">Realtime Txn stats</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<br /><br /><br />
+<div id="main-content" class="container">
+    <div class="row" ng-repeat="x in ruleaudits">
+        <div class="panel panel-primary">
+            <div class="panel-heading">Transaction: {{ x.transactionId }}</div>
+            <div class="panel-body">
+                <div class="alert alert-{{ x.labelType }}" role="alert">
+                    <h4>
+                        <i class="fa fa-warning">RuleFlow: {{ x.flowName }}</i>
+                    </h4>
+                </div>
+                <div class="col-md-12">
+                    <div class="well row">
+                        <div class="col-md-12" id="i{{ $index }}">
+                            {{ x.pipeline.trim() }}
+                        </div>
+                    </div>
+                    <div>{{ draw('i'+$index) }}</div>
+
+                    <div class="col-md-2">
+                        <div class="jumbotron">
+                            <h2 class="display-4">{{ x.totalTimeTakenInMillis }} ms</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-10">
+                        <table class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Rule Name</th>
+                                <th>Execution Time in millis</th>
+                                <th>Status</th>
+                                <th>Error Msg</th>
+                                <th>Rule Definition</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="y in x.ruleInfos">
+                                <th scope="row">{{ $index }}</th>
+                                <td>{{ y.ruleName }}</td>
+                                <td>{{ y.execTime }}</td>
+                                <td>{{ y.status }}</td>
+                                <td>{{ y.errorMsg }}</td>
+                                <td><a href="#">click here</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+    </div>
+</div>
+<hr/>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "predModelDef": {
+    "id": "something",
+    "description": "sssss",
+    "datasource": {
+      "kind": "csv|rdbms|mongo",
+      "value": "/s/s/s.csv | movies"
+    },
+    "schema": {
+      "columns": [
+        {
+          "name": "foo",
+          "kind": "ordinal",
+          "enumeration": [
+            "1",
+            "2"
+          ]
+        },
+        {
+          "name": "bar",
+          "kind": "continuous"
+        }
+      ]
+    },
+    "problemType": "CLASSIFICATION|REGRESSION",
+    "modelType": "TYPE_FEEDFORWARD"
+  },
+  "normalizedValuesBlob": "",
+  "trainedModelBlob": "",
+  "lastTrainedDateTime": 3333,
+  "lastTrainingTimeTookInSeconds": 221,
+  "trainingDatasetSize": 22344,
+  "status": ""
+}
