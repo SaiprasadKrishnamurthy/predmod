@@ -239,7 +239,7 @@ The fields are defined in the JSON above.
 
 ## Modelling Algorithms supported
 **feedforward, bayesian, rbfnetwork, svm, som, pnn, neat, epl**
-modelType in the configuration JSON reflects this.
+* **modelType** in the configuration JSON reflects this.
 
 Whenever the model is changed, you must retrain and rebuild the model.
 
