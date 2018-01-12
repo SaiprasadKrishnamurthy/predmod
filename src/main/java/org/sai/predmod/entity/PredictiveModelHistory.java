@@ -41,6 +41,13 @@ public class PredictiveModelHistory {
     @Enumerated(value = EnumType.STRING)
     private PredictiveModelJobStatusType status;
 
-    @Column
+    @Column(length = 10 * 1024 * 1024)
     private String error;
+
+    @Transient
+    private String definitionJson;
+
+    public String getDefinitionJson() {
+        return new String(predModelDefJson);
+    }
 }

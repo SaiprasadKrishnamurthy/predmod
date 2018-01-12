@@ -8,4 +8,5 @@ public class Column {
     private String name;
     private ColumnType kind;
     private String[] enumerations;
+    private MissingValueFunctionType missingValue;
 }

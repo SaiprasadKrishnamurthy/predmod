@@ -2,6 +2,7 @@ package org.sai.predmod.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.encog.ConsoleStatusReportable;
 import org.encog.ml.MLRegression;
@@ -51,9 +52,13 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
     @Override
     public void train(final PredictiveModel predictiveModel) {
         try {
-            snapshotHistory(predictiveModel);
+            if (predictiveModel.getStatus() != PredictiveModelJobStatusType.Created) {
+                snapshotHistory(predictiveModel);
+            }
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
+            predictiveModel.setStatus(PredictiveModelJobStatusType.InProgress);
+            predictiveModelRepository.save(predictiveModel);
             PredictiveModelDef predictiveModelDef = OBJECT_MAPPER.readValue(new String(predictiveModel.getPredModelDefJson()), PredictiveModelDef.class);
             VersatileDataSource dataSource = datasourceFactory.dataSource(predictiveModelDef);
             VersatileMLDataSet data = new VersatileMLDataSet(dataSource);
@@ -66,7 +71,9 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
                 if (inputColumn.getKind() == ColumnType.ordinal) {
                     columnDefinition.defineClass(inputColumn.getEnumerations());
                 }
-                data.getNormHelper().defineMissingHandler(columnDefinition, MissingHandlers.missingHandlerFor(predictiveModelDef.getMissingValue()));
+                if (inputColumn.getMissingValue() != null) {
+                    data.getNormHelper().defineMissingHandler(columnDefinition, MissingHandlers.missingHandlerFor(inputColumn.getMissingValue()));
+                }
                 index.increment();
             });
 
@@ -109,12 +116,16 @@ public class DefaultPredictiveAnalyticsService implements PredictiveAnalyticsSer
             predictiveModel.setNormalizedValuesBlob(helperSer);
             predictiveModel.setTrainingDatasetSize(model.getTrainingDataset().size());
             predictiveModel.setLastTrainingTimeTookInSeconds(stopWatch.getTotalTimeSeconds());
+            predictiveModel.setLastTrainedDateTime(System.currentTimeMillis());
 
             // update the model.
+            predictiveModel.setStatus(PredictiveModelJobStatusType.Completed);
             predictiveModelRepository.save(predictiveModel);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            predictiveModel.setStatus(PredictiveModelJobStatusType.Completed);
+            predictiveModel.setError(ExceptionUtils.getStackTrace(e));
+            predictiveModelRepository.save(predictiveModel);
             throw new RuntimeException(e);
         }
     }

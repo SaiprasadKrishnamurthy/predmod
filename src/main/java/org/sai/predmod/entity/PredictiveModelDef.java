@@ -14,7 +14,6 @@ public class PredictiveModelDef implements Serializable {
     private String datasourceValue;
     private List<Column> inputColumns;
     private String unknownValueRepresentedAs = "?";
-    private MissingValueFunctionType missingValue = MissingValueFunctionType.Mean;
     private Column predictedColumn;
     private ProblemType problemType;
     private ModelType modelType = ModelType.feedforward;

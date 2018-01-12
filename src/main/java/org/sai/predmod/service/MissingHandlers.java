@@ -1,5 +1,7 @@
 package org.sai.predmod.service;
 
+import org.encog.EncogError;
+import org.encog.ml.data.versatile.NormalizationHelper;
 import org.encog.ml.data.versatile.columns.ColumnDefinition;
 import org.encog.ml.data.versatile.missing.MeanMissingHandler;
 import org.encog.ml.data.versatile.missing.MissingHandler;
@@ -32,6 +34,23 @@ public final class MissingHandlers {
                 @Override
                 public double processDouble(final ColumnDefinition columnDefinition) {
                     return columnDefinition.getSd();
+                }
+            };
+        } else if (missingValueFunctionType == MissingValueFunctionType.QuestionMarkString) {
+            return new MissingHandler() {
+                @Override
+                public void init(NormalizationHelper normalizationHelper) {
+
+                }
+
+                @Override
+                public String processString(ColumnDefinition columnDefinition) {
+                    return "?";
+                }
+
+                @Override
+                public double processDouble(final ColumnDefinition columnDefinition) {
+                    throw new EncogError("This doesn't accept a numeric value.");
                 }
             };
         } else {

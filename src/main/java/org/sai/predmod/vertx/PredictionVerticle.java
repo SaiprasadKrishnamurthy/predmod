@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.Message;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.sai.predmod.entity.PredictiveModel;
 import org.sai.predmod.model.PredictionInput;
 import org.sai.predmod.model.PredictiveAnalyticsService;
@@ -40,15 +41,18 @@ public class PredictionVerticle extends AbstractVerticle {
     }
 
     private void exec(final Message<String> msg) {
+        PredictionInput predictionInput = null;
         try {
             String predictionInputJson = msg.body();
-            PredictionInput predictionInput = OBJECT_MAPPER.readValue(predictionInputJson, PredictionInput.class);
+            predictionInput = OBJECT_MAPPER.readValue(predictionInputJson, PredictionInput.class);
             LOG.info(" \t Prediction: {}", predictionInput);
             PredictiveModel model = predictiveModelRepository.findByPredModelDefId(predictionInput.getModelId());
             Object predictedValue = predictiveAnalyticsService.predict(model, predictionInput.getInputs());
             getVertx().eventBus().send(predictionInput.getTransactionId(), predictedValue);
         } catch (Exception ex) {
             LOG.error("Error", ex);
+            getVertx().eventBus().send(predictionInput.getTransactionId() + "|ERROR", ExceptionUtils.getStackTrace(ex));
+
         }
     }
 }

@@ -1,0 +1,16 @@
+{
+  "age": "20",
+  "workclass": "Private",
+  "fnlwgt": "44064",
+  "education": "Some-college",
+  "education-num": "10",
+  "marital-status": "Never-married",
+  "occupation": "Prof-specialty",
+  "relationship": "Own-child",
+  "race": "White",
+  "sex": "Male",
+  "capital-gain": "0",
+  "capital-loss": "0",
+  "hours-per-week": "25",
+  "native-country": "United-States"
+}

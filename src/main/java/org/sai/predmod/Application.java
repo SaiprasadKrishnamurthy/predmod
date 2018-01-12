@@ -2,10 +2,9 @@ package org.sai.predmod;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.IOUtils;
 import org.encog.ml.data.versatile.columns.ColumnType;
 import org.sai.predmod.entity.*;
-import org.sai.predmod.model.PredictionInput;
 import org.sai.predmod.model.PredictiveAnalyticsService;
 import org.sai.predmod.repository.PredictiveModelRepository;
 import org.sai.predmod.vertx.Bootstrap;
@@ -25,7 +24,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -53,12 +51,22 @@ public class Application {
                                       final PredictiveAnalyticsService predictiveAnalyticsService,
                                       final Bootstrap bootstrap) {
         return (args) -> {
-            irisClassification(predictiveModelRepository, predictiveAnalyticsService);
+            setupIrisClassification(predictiveModelRepository);
+            setupIncomeClassification(predictiveModelRepository);
             bootstrap.getVertx().eventBus().send(TrainingVerticle.class.getName(), "iris-classification");
+            bootstrap.getVertx().eventBus().send(TrainingVerticle.class.getName(), "income-classification");
         };
     }
 
-    private void irisClassification(PredictiveModelRepository predictiveModelRepository, PredictiveAnalyticsService predictiveAnalyticsService) throws JsonProcessingException {
+    private void setupIncomeClassification(PredictiveModelRepository predictiveModelRepository) throws Exception {
+        byte[] defJson = IOUtils.toByteArray(Application.class.getClassLoader().getResourceAsStream("income-classification-definition.json"));
+        PredictiveModel model = new PredictiveModel();
+        model.setPredModelDefJson(defJson);
+        model.setPredModelDefId("income-classification");
+        predictiveModelRepository.save(model);
+    }
+
+    private void setupIrisClassification(PredictiveModelRepository predictiveModelRepository) throws JsonProcessingException {
         PredictiveModelDef def = new PredictiveModelDef();
         def.setId("iris-classification");
         def.setDescription("Iris classification");
@@ -81,38 +89,12 @@ public class Application {
         def.setModelType(ModelType.feedforward);
         def.setTrainingIterations(2);
         String json = new ObjectMapper().writeValueAsString(def);
+        System.out.println(new ObjectMapper().writeValueAsString(def));
+
         PredictiveModel model = new PredictiveModel();
         model.setPredModelDefJson(json.getBytes());
         model.setPredModelDefId(def.getId());
         predictiveModelRepository.save(model);
-        Map<String, Object> inputs = ImmutableMap.of("sepal-length", 5.7, "sepal-width", 3.0, "petal-length", 4.2, "petal-width", 1.2);
-        PredictionInput predictionInput = new PredictionInput();
-        predictionInput.setModelId("iris-classification");
-        predictionInput.setInputs(inputs);
-        System.out.println(new ObjectMapper().writeValueAsString(predictionInput));
-
-
-        /*System.out.println(new ObjectMapper().writeValueAsString(def));
-        System.out.println("Start training ");
-        predictiveAnalyticsService.train(model);
-
-        System.out.println(predictiveModelRepository.findAll());
-
-        System.out.println("Start Prediction ");
-
-        Map<String, Object> inputs = ImmutableMap.of("sepal-length", 5.7, "sepal-width", 3.0, "petal-length", 4.2, "petal-width", 1.2);
-        System.out.println(predictiveAnalyticsService.predict(model, inputs));
-
-        inputs = ImmutableMap.of("sepal-length", 5.7, "sepal-width", 3.0, "petal-length", 4.2, "petal-width", 1.2);
-        System.out.println(predictiveAnalyticsService.predict(model, inputs));
-
-        inputs = ImmutableMap.of("sepal-length", 5.9, "sepal-width", 3.0, "petal-length", 5.1, "petal-width", 1.8);
-        System.out.println(predictiveAnalyticsService.predict(model, inputs));
-
-        inputs = ImmutableMap.of("sepal-length", 5.1, "sepal-width", 3.5, "petal-length", 1.4, "petal-width", 0.3);
-        System.out.println(predictiveAnalyticsService.predict(model, inputs));
-
-        System.out.println(" ----- ");*/
     }
 
     public static void main(String[] args) {

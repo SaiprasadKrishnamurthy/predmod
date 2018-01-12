@@ -1,9 +1,16 @@
 {
-  "nationality": "IN",
-  "cob": "GB",
-  "gender": "F",
-  "eventType": "MOVEMENT_EVENT",
-  "eventSubtype": "BOOKING",
-  "pob": "BLR",
-  "visa": "T1"
+  "age": 44,
+  "workclass": "Private",
+  "fnlwgt": 178385,
+  "education": "Masters",
+  "education-num": 14,
+  "marital-status": "Married-civ-spouse",
+  "occupation": "Exec-managerial",
+  "relationship": "Husband",
+  "race": "Asian-Pac-Islander",
+  "sex": "Male",
+  "capital-gain": 0,
+  "capital-loss": 0,
+  "hours-per-week": 48,
+  "native-country": "India"
 }

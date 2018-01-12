@@ -11,5 +11,5 @@ public interface PredictiveModelRepository extends CrudRepository<PredictiveMode
 
     List<PredictiveModel> findByStatusOrderByLastTrainedDateTime(PredictiveModelJobStatusType statusType);
 
-    List<PredictiveModel> findAllByOrderByLastTrainedDateTime();
+    List<PredictiveModel> findAllByOrderByLastTrainedDateTimeDesc();
 }

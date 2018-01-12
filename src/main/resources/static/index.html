@@ -2,16 +2,13 @@
 <meta name="robots" content="noindex">
 <html>
 <head>
-    <script type="text/javascript" src="/mermaid.js"></script>
     <link href="/mermaid.css" rel="stylesheet" type="text/css"/>
     <link href="bootstrap.min.css" rel="stylesheet">
     <script src="/jquery.min.js"></script>
     <script src="/webfont.js"></script>
-    <script src="/snap.svg-min.js"></script>
     <script src="/underscore-min.js"></script>
     <script src="/angular.min.js"></script>
     <script src="/angular.sanitize.js"></script>
-    <script src="/mermaid.js"></script>
     <style>
         div.well {
             overflow-y: scroll;
@@ -20,22 +17,21 @@
 
 
 
+
+
+
     </style>
     <script>
         var app = angular.module("myApp", []);
         app.controller("myCtrl", function($scope, $http) {
-            $http.get('/ruleaudits').
+            $http.get('/models').
                 then(function(response) {
-                $scope.ruleaudits = response.data;
+                $scope.models = response.data;
             });
-
-            $scope.draw = function(id) {
-                setTimeout(function() {
-                    mermaidAPI.render(id, $("#"+id).text().trim(), function(code, fns){document.getElementById(id).innerHTML=code});
-                }, 1);
-            }
-
         });
+
+
+
 
 
 
@@ -48,6 +44,9 @@
         }
         svg { width: 200% }
 
+
+
+
     </style>
 
 </head>
@@ -56,62 +55,72 @@
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
-            <a class="navbar-brand" href="/">Rulebase</a>
+            <a class="navbar-brand" href="/">PredMod</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="/">Transactions <span class="sr-only">(current)</span></a></li>
-                <li><a href="/stats.html">Realtime Txn stats</a></li>
+                <li class="active"><a href="/">Predictive Models <span class="sr-only">(current)</span></a></li>
             </ul>
         </div>
     </div>
 </nav>
-<br /><br /><br />
+<br/><br/><br/>
 <div id="main-content" class="container">
-    <div class="row" ng-repeat="x in ruleaudits">
+    <div class="row" ng-repeat="x in models">
         <div class="panel panel-primary">
-            <div class="panel-heading">Transaction: {{ x.transactionId }}</div>
+            <div class="panel-heading">Model: {{ x.predModelDefId }}</div>
             <div class="panel-body">
-                <div class="alert alert-{{ x.labelType }}" role="alert">
-                    <h4>
-                        <i class="fa fa-warning">RuleFlow: {{ x.flowName }}</i>
-                    </h4>
-                </div>
                 <div class="col-md-12">
-                    <div class="well row">
+                    <div class="well row" style="background-color: #66ff66">
                         <div class="col-md-12" id="i{{ $index }}">
-                            {{ x.pipeline.trim() }}
+                            <h2>{{ x.definition.description }}</h2>
                         </div>
                     </div>
-                    <div>{{ draw('i'+$index) }}</div>
+                    <div class="well row">
+                        <div class="col-md-3">
+                            <b> Datasource Type: {{ x.definition.datasourceType }}</b>
+                        </div>
+                        <div class="col-md-3">
+                            <b>Datasource: {{ x.definition.datasourceValue }}</b>
+                        </div>
+                        <div class="col-md-3">
+                            <b>Problem Type: {{ x.definition.problemType }}</b>
+                        </div>
+                        <div class="col-md-3">
+                            <b>Model Algorithm: {{ x.definition.modelType }}</b>
+                        </div>
 
-                    <div class="col-md-2">
-                        <div class="jumbotron">
-                            <h2 class="display-4">{{ x.totalTimeTakenInMillis }} ms</h2>
+                    </div>
+                    <div class="well row">
+                        <div class="col-md-12">
+                            <h4>Field to be predicted: {{ x.definition.predictedColumn.name }}</h4>
                         </div>
                     </div>
-                    <div class="col-md-10">
+                    <div class="col-md-3">
+                        <div class="jumbotron">
+                            <h2 class="display-4">{{ x.lastTrainingTimeTookInSeconds }} S</h2>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
                         <table class="table table-striped">
                             <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Rule Name</th>
-                                <th>Execution Time in millis</th>
-                                <th>Status</th>
-                                <th>Error Msg</th>
-                                <th>Rule Definition</th>
+                                <th>Input Column Name</th>
+                                <th>Column Type</th>
+                                <th>Enumerations (if any)</th>
+                                <th>Missing Value</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="y in x.ruleInfos">
+                            <tr ng-repeat="y in x.definition.inputColumns">
                                 <th scope="row">{{ $index }}</th>
-                                <td>{{ y.ruleName }}</td>
-                                <td>{{ y.execTime }}</td>
-                                <td>{{ y.status }}</td>
-                                <td>{{ y.errorMsg }}</td>
-                                <td><a href="#">click here</a></td>
+                                <td>{{ y.name }}</td>
+                                <td>{{ y.kind }}</td>
+                                <td style="word-wrap: break-word;min-width: 160px;max-width: 160px;"><p>{{ y.enumerations }}</p></td>
+                                <td>{{ y.missingValue }}</td>
                             </tr>
                             </tbody>
                         </table>
