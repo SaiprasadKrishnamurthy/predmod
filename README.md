@@ -253,6 +253,10 @@ You can switch to a real RDBMS by changing the values in the src/main/resources/
 ## Simple View UI
 * * Once the app is up and running, http://localhost:52073/ lists you all the available models in a simple UI.
 
+![Models UI](ui.png?raw=true "Rule Audit ")
+
+## License
+This project is licensed under Apache License 2.0
 
 
 
