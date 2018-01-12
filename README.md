@@ -238,7 +238,7 @@ A sample income.csv file looks like this (just a few lines):
 The fields are defined in the JSON above.
 
 ## Modelling Algorithms supported
-** feedforward, bayesian, rbfnetwork, svm, som, pnn, neat, epl **
+**feedforward, bayesian, rbfnetwork, svm, som, pnn, neat, epl**
 modelType in the configuration JSON reflects this.
 
 Whenever the model is changed, you must retrain and rebuild the model.
