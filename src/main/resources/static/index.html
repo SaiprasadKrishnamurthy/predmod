@@ -10,16 +10,7 @@
     <script src="/angular.min.js"></script>
     <script src="/angular.sanitize.js"></script>
     <style>
-        div.well {
-            overflow-y: scroll;
-        }
-
-
-
-
-
-
-
+        div.well { overflow-y: scroll;}
     </style>
     <script>
         var app = angular.module("myApp", []);
@@ -29,13 +20,6 @@
                 $scope.models = response.data;
             });
         });
-
-
-
-
-
-
-
     </script>
 
     <style>
@@ -73,7 +57,7 @@
             <div class="panel-heading">Model: {{ x.predModelDefId }}</div>
             <div class="panel-body">
                 <div class="col-md-12">
-                    <div class="well row" style="background-color: #66ff66">
+                    <div class="well row" style="background-color: #99ccff">
                         <div class="col-md-12" id="i{{ $index }}">
                             <h2>{{ x.definition.description }}</h2>
                         </div>
