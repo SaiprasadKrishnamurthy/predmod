@@ -2,6 +2,7 @@ package org.sai.predmod.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.sai.predmod.entity.PredictiveModel;
 import org.sai.predmod.entity.PredictiveModelDef;
 import org.sai.predmod.entity.PredictiveModelHistory;
@@ -36,6 +37,7 @@ public class PredictiveModelApi {
     @Autowired
     private PredictiveModelHistoryRepository predictiveModelHistoryRepository;
 
+    @ApiOperation("Predict the value based on a trained model")
     @PostMapping("/predict/{modelId}")
     public DeferredResult<?> predict(@PathVariable("modelId") final String modelId, final @RequestBody Map<String, Object> input, final HttpServletResponse httpServletResponse) throws Exception {
         DeferredResult<Object> response = new DeferredResult<>();
@@ -58,6 +60,7 @@ public class PredictiveModelApi {
         return response;
     }
 
+    @ApiOperation("Save or update the model configuration")
     @PutMapping("/model")
     public ResponseEntity<?> saveOrUpdateModel(final @RequestBody PredictiveModelDef modelDef) throws Exception {
         PredictiveModel predictiveModel = new PredictiveModel();
@@ -67,11 +70,13 @@ public class PredictiveModelApi {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @ApiOperation("List all the models")
     @GetMapping("/models")
     public ResponseEntity<Iterable<PredictiveModel>> findAll() throws Exception {
         return new ResponseEntity<>(predictiveModelRepository.findAllByOrderByLastTrainedDateTimeDesc(), HttpStatus.OK);
     }
 
+    @ApiOperation("List all the historical models (snapshotted)")
     @GetMapping("/model-history")
     public ResponseEntity<Iterable<PredictiveModelHistory>> findAllHistory() throws Exception {
         return new ResponseEntity<>(predictiveModelHistoryRepository.findAllByOrderByLastTrainedDateTimeDesc(), HttpStatus.OK);
